@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeButtons = document.querySelectorAll('.detailed-card-popup .close-btn');
     const overlay = document.querySelector('.overlay');
 
-    // Handle form submission with a fixed-time loading pop-up and success pop-up
+    // Handle form submission pop-ups
     const appointmentForm = document.getElementById('appointment-form');
     const loadingPopup = document.getElementById('loading-popup-container');
     const successPopup = document.getElementById('success-popup-container');
@@ -75,9 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close pop-up when clicking outside on the overlay
     overlay.addEventListener('click', () => {
-        // Close doctor cards but not the form popups
-        const activeCards = document.querySelectorAll('.detailed-card-popup.active');
-        activeCards.forEach(card => {
+        const activeDetailedCards = document.querySelectorAll('.detailed-card-popup.active');
+        activeDetailedCards.forEach(card => {
             card.classList.remove('active');
         });
         
@@ -104,10 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.textContent = timer;
         const timerInterval = setInterval(() => {
             timer--;
-            timerDisplay.textContent = timer;
-            if (timer <= 0) {
+            if (timer >= 0) {
+                timerDisplay.textContent = timer;
+            } else {
+                // If the timer reaches zero, but the submission is still ongoing,
+                // keep the popup open but stop the count.
                 clearInterval(timerInterval);
-                // The timer finishes, but we still wait for the actual response
+                timerDisplay.textContent = '...';
             }
         }, 1000);
 
@@ -130,20 +132,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     successPopup.classList.add('active');
                     appointmentForm.reset();
                 } else {
-                    // Show a generic error message
                     alert('Error submitting appointment. Please try again.');
                     overlay.classList.remove('active');
                 }
             } else {
+                // If network response is not ok
                 clearInterval(timerInterval);
                 loadingPopup.classList.remove('active');
-                throw new Error('Network response was not ok.');
+                alert('Network error. Please check your connection and try again.');
+                overlay.classList.remove('active');
             }
         } catch (error) {
+            // If fetch call fails entirely
             console.error('Error:', error);
             clearInterval(timerInterval);
             loadingPopup.classList.remove('active');
-            alert('Error submitting appointment. Please try again.');
+            alert('An unexpected error occurred. Please try again.');
             overlay.classList.remove('active');
         }
     });
