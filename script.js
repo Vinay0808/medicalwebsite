@@ -1,6 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     const hamburger = document.querySelector('.hamburger');
     const nav = document.querySelector('nav');
+    const bookAppointmentButtons = document.querySelectorAll('.book-appointment');
+    const appointmentSection = document.getElementById('appointment');
+    const doctorSelect = document.getElementById('doctor');
+    const moreDetailsButtons = document.querySelectorAll('.more-details');
+    const closeButtons = document.querySelectorAll('.detailed-card-popup .close-btn');
+    const overlay = document.querySelector('.overlay');
+
+    // Handle form submission with a fixed-time loading pop-up and success pop-up
+    const appointmentForm = document.getElementById('appointment-form');
+    const loadingPopup = document.getElementById('loading-popup-container');
+    const successPopup = document.getElementById('success-popup-container');
+    const timerDisplay = document.getElementById('timer-display');
+    const okButton = document.getElementById('ok-btn');
 
     // Toggle navigation menu on hamburger click
     hamburger.addEventListener('click', () => {
@@ -16,14 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const bookAppointmentButtons = document.querySelectorAll('.book-appointment');
-    const appointmentSection = document.getElementById('appointment');
-
-    // Highlight the appointment form when "Book Appointment" is clicked
+    // Handle "Book Appointment" buttons
     bookAppointmentButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
+            
+            const doctorId = button.getAttribute('data-doctor-id');
+            if (doctorId) {
+                doctorSelect.value = doctorId;
+            } else {
+                doctorSelect.value = '';
+            }
+            
             appointmentSection.scrollIntoView({ behavior: 'smooth' });
+
             appointmentSection.classList.add('highlight');
             setTimeout(() => {
                 appointmentSection.classList.remove('highlight');
@@ -31,15 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    const moreDetailsButtons = document.querySelectorAll('.more-details');
-    const overlay = document.querySelector('.overlay');
-
-    // Show doctor details card
+    // Show doctor details pop-up
     moreDetailsButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             const doctorId = button.getAttribute('data-doctor-id');
-            const detailedCard = document.getElementById(${doctorId}-details);
+            const detailedCard = document.getElementById(`${doctorId}-details`);
             
             if (detailedCard) {
                 detailedCard.classList.add('active');
@@ -48,30 +64,52 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Close doctor details card
-    const closeButtons = document.querySelectorAll('.detailed-card .close-btn');
+    // Close doctor details pop-up
     closeButtons.forEach(button => {
         button.addEventListener('click', () => {
-            const parentCard = button.closest('.detailed-card');
+            const parentCard = button.closest('.detailed-card-popup');
             parentCard.classList.remove('active');
             overlay.classList.remove('active');
         });
     });
 
+    // Close pop-up when clicking outside on the overlay
     overlay.addEventListener('click', () => {
-        const activeCards = document.querySelectorAll('.detailed-card.active');
+        // Close doctor cards but not the form popups
+        const activeCards = document.querySelectorAll('.detailed-card-popup.active');
         activeCards.forEach(card => {
             card.classList.remove('active');
         });
+        
+        // Hide overlay if no popups are active
+        if (!loadingPopup.classList.contains('active') && !successPopup.classList.contains('active')) {
+            overlay.classList.remove('active');
+        }
+    });
+
+    // Handle OK button click to dismiss success pop-up
+    okButton.addEventListener('click', () => {
+        successPopup.classList.remove('active');
         overlay.classList.remove('active');
     });
 
-    // Handle form submission with AJAX
-    const appointmentForm = document.getElementById('appointment-form');
-    const formMessage = document.getElementById('form-message');
-
     appointmentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // Show the loading popup and start a 10-second timer
+        loadingPopup.classList.add('active');
+        overlay.classList.add('active');
+
+        let timer = 10;
+        timerDisplay.textContent = timer;
+        const timerInterval = setInterval(() => {
+            timer--;
+            timerDisplay.textContent = timer;
+            if (timer <= 0) {
+                clearInterval(timerInterval);
+                // The timer finishes, but we still wait for the actual response
+            }
+        }, 1000);
 
         const formData = new FormData(appointmentForm);
         const actionUrl = appointmentForm.getAttribute('action');
@@ -79,34 +117,34 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(actionUrl, {
                 method: 'POST',
-                body: formData,
-                headers: {
-                    'Accept': 'text/plain'
-                }
+                body: formData
             });
 
-            const result = await response.text();
-            formMessage.style.display = 'block';
-            if (result === 'Success') {
-                formMessage.style.color = '#4ecdc4';
-                formMessage.textContent = 'Appointment submitted successfully!';
-                appointmentForm.reset();
+            if (response.ok) {
+                const result = await response.text();
+                // We've received a response, so clear the timer and hide the loading popup
+                clearInterval(timerInterval);
+                loadingPopup.classList.remove('active');
+                
+                if (result.trim() === 'Success') {
+                    successPopup.classList.add('active');
+                    appointmentForm.reset();
+                } else {
+                    // Show a generic error message
+                    alert('Error submitting appointment. Please try again.');
+                    overlay.classList.remove('active');
+                }
             } else {
-                formMessage.style.color = '#ff6b6b';
-                formMessage.textContent = 'Error submitting appointment: ' + result;
+                clearInterval(timerInterval);
+                loadingPopup.classList.remove('active');
+                throw new Error('Network response was not ok.');
             }
-
-            setTimeout(() => {
-                formMessage.style.display = 'none';
-            }, 5000);
         } catch (error) {
             console.error('Error:', error);
-            formMessage.style.display = 'block';
-            formMessage.style.color = '#ff6b6b';
-            formMessage.textContent = 'Error submitting appointment. Please try again.';
-            setTimeout(() => {
-                formMessage.style.display = 'none';
-            }, 5000);
+            clearInterval(timerInterval);
+            loadingPopup.classList.remove('active');
+            alert('Error submitting appointment. Please try again.');
+            overlay.classList.remove('active');
         }
     });
 });
