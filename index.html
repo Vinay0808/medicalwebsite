@@ -253,10 +253,19 @@
         </div>
     </div>
     
-    <div id="popup-message-container" class="popup-message-container">
+    <div id="loading-popup-container" class="popup-message-container">
         <div class="popup-content">
-            <span id="close-popup" class="close-btn">&times;</span>
-            <p id="popup-message-text"></p>
+            <p id="loading-message-text">Submitting your appointment request...</p>
+            <div class="timer-container">
+                <span id="timer-display">10</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-popup-container" class="popup-message-container">
+        <div class="popup-content">
+            <p id="success-message-text">Appointment submitted successfully!</p>
+            <button id="ok-btn" class="btn">OK</button>
         </div>
     </div>
     
@@ -377,23 +386,7 @@
     <a href="https://wa.me/916302078906" class="whatsapp-float" target="_blank">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
     </a>
-<div id="loading-popup-container" class="popup-message-container">
-    <div class="popup-content">
-        <p id="loading-message-text">Submitting your appointment request...</p>
-        <div class="timer-container">
-            <span id="timer-display">10</span>
-        </div>
-    </div>
-</div>
 
-<div id="success-popup-container" class="popup-message-container">
-    <div class="popup-content">
-        <p id="success-message-text">Appointment submitted successfully!</p>
-        <button id="ok-btn" class="btn">OK</button>
-    </div>
-</div>
-
-<div class="overlay"></div>
     <script src="script.js"></script>
 </body>
 </html>
