@@ -77,7 +77,7 @@ nav a:hover {
 }
 
 .hamburger.active {
-    transform: rotate(90deg); /* Smoothly rotates the icon when the nav is active */
+    transform: rotate(90deg);
 }
 
 /* Hero Section */
@@ -763,6 +763,7 @@ footer {
         flex-direction: column;
         align-items: flex-start;
     }
+
     nav {
         display: flex;
         width: 100%;
@@ -772,26 +773,22 @@ footer {
         position: absolute;
         top: 60px;
         left: 0;
-        transform: translateX(100%);
+        /* Start off-screen to the left */
+        transform: translateX(100%); 
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
-        transition:
-            transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-            visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    nav.active {
-        transform: translateX(0);
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     nav.active {
-        transform: translateX(0);
-        visibility: visible; /* Show the menu when active */
+        /* Slide into view */
+        transform: translateX(0); 
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
     }
 
     nav a {
