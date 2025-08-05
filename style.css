@@ -42,6 +42,7 @@ header {
     font-weight: 700;
     letter-spacing: 1.2px;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    color: white; /* Make sure logo color is white */
 }
 
 nav {
@@ -139,6 +140,7 @@ nav a:hover {
     display: inline-block;
     text-align: center;
     cursor: pointer;
+    border: none;
 }
 
 .btn:hover {
@@ -487,7 +489,7 @@ nav a:hover {
 }
 
 /* Detailed Card Styles */
-.detailed-card {
+.detailed-card-popup {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -508,43 +510,46 @@ nav a:hover {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.detailed-card.active {
+.detailed-card-popup.active {
     display: block;
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
 
-.detailed-card .close-btn {
+.detailed-card-popup .close-btn {
     position: absolute;
     top: 15px;
     right: 15px;
     font-size: 1.5em;
     cursor: pointer;
     color: #d63031;
+    z-index: 1003;
 }
 
-.detailed-card img {
-    width: 50%;
-    height: 250px;
+.detailed-card-popup img {
+    width: 200px; /* Set a fixed size for the round image */
+    height: 200px; /* Ensure it's a perfect circle */
     object-fit: cover;
-    border-radius: 15px;
+    border-radius: 50%; /* Make the image round */
+    border: 5px solid #ff6b6b; /* Add a border with a specific color */
     margin: 0 auto 15px auto;
     display: block;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for a pop effect */
 }
 
-.detailed-card h3 {
+.detailed-card-popup h3 {
     color: #d63031;
     font-size: 1.8em;
     margin-bottom: 15px;
 }
 
-.detailed-card p {
+.detailed-card-popup p {
     color: #4a5568;
     font-size: 1em;
     margin-bottom: 15px;
 }
 
-.detailed-card .contact-buttons {
+.detailed-card-popup .contact-buttons {
     display: flex;
     gap: 15px;
     margin-top: 20px;
@@ -552,16 +557,16 @@ nav a:hover {
     justify-content: center;
 }
 
-.detailed-card .whatsapp-btn,
-.detailed-card .call-btn {
+.detailed-card-popup .whatsapp-btn,
+.detailed-card-popup .call-btn {
     min-width: 150px;
 }
 
-.detailed-card .whatsapp-btn {
+.detailed-card-popup .whatsapp-btn {
     background: linear-gradient(135deg, #25D366, #128C7E);
 }
 
-.detailed-card .call-btn {
+.detailed-card-popup .call-btn {
     background: linear-gradient(135deg, #4ecdc4, #96c93d);
 }
 
@@ -602,6 +607,8 @@ form:hover {
 form label {
     font-weight: 500;
     color: #2d3748;
+    display: block; /* Make labels block-level for better spacing */
+    margin-top: 15px;
 }
 
 form input, form textarea, form select {
@@ -658,28 +665,75 @@ footer {
     margin: 0 auto;
 }
 
-.footer-links a {
+.footer-links a, .social-links a {
     color: white;
     text-decoration: none;
     margin: 0 1rem;
+    transition: color 0.3s;
 }
 
-.footer-links a:hover {
+.footer-links a:hover, .social-links a:hover {
     text-decoration: underline;
     color: #ffe66d;
 }
+/* Add to your CSS file */
 
-.social-links a {
-    color: white;
-    text-decoration: none;
-    margin: 0 0.5rem;
+.popup-message-container {
+    /* ... (existing styles for popup) ... */
+    display: none;
+    text-align: center;
 }
 
-.social-links a:hover {
-    text-decoration: underline;
-    color: #ffe66d;
+.popup-message-container.active {
+    display: block;
 }
 
+.timer-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 5px solid #4ecdc4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    font-size: 2em;
+    font-weight: bold;
+    color: #4ecdc4;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(78, 205, 196, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(78, 205, 196, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(78, 205, 196, 0); }
+}
+
+/* Styles for the new "OK" button */
+#success-popup-container .btn {
+    margin-top: 15px;
+    padding: 12px 25px;
+    font-size: 1em;
+}
+
+/* Specific styling for different popups */
+#loading-popup-container .popup-content {
+    background-color: #f0f4f8;
+    border: 2px solid #4ecdc4;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+#success-popup-container .popup-content {
+    background-color: #e9f7ef;
+    border: 2px solid #96c93d;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.popup-message-container .close-btn {
+    display: none; /* Hide the close button on these popups */
+}
 /* WhatsApp Float */
 .whatsapp-float {
     position: fixed;
@@ -752,11 +806,6 @@ footer {
         align-items: center;
     }
 
-    .stats {
-        flex-direction: column;
-        align-items: center;
-    }
-
     /* Adjust new about section for mobile */
     .about-main-info {
         flex-direction: column;
@@ -770,4 +819,57 @@ footer {
     .about-hero-content h2 {
         font-size: 2.5em;
     }
+}
+/* New CSS for the pop-up message */
+.popup-message-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1001; /* Higher than the overlay */
+    display: none;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.popup-message-container.active {
+    display: block;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup-content {
+    position: relative;
+}
+
+.popup-message-container .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+.popup-message-container.success {
+    border: 2px solid #4ecdc4;
+}
+
+.popup-message-container.success p {
+    color: #4ecdc4;
+    font-weight: bold;
+}
+
+.popup-message-container.error {
+    border: 2px solid #ff6b6b;
+}
+
+.popup-message-container.error p {
+    color: #ff6b6b;
+    font-weight: bold;
 }
